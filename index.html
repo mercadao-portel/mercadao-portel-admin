@@ -244,38 +244,18 @@
 
             <input type="hidden" id="produtoId" />
             <div class="field">
-              <label for="produtoNome">Nome do produto</label>
-              <input type="text" id="produtoNome" placeholder="Ex.: Café 250g" />
-            </div>
-            <div class="field">
-              <label for="produtoCategoria">Categoria</label>
-            <select id="produtoCategoria">
-              <option value="">Selecione</option>
+              <label for="produtoSetor">Setor</label>
+<select id="produtoSetor" onchange="atualizarCategoriasPorSetor()">
+  <option value="">Selecione o setor</option>
+  <option value="Mercantil">Mercantil</option>
+  <option value="Padaria">Padaria</option>
+  <option value="Açougue">Açougue</option>
+</select>
 
-              <option value="Mercearia">Mercearia</option>
-              <option value="Bebidas">Bebidas</option>
-              <option value="Laticínios">Laticínios</option>
-              <option value="Frios">Frios</option>
-              <option value="Higiene">Higiene</option>
-              <option value="Limpeza">Limpeza</option>
-              <option value="Bazar">Bazar</option>
-              <option value="Enlatados">Enlatados</option>
-              <option value="Matinais">Matinais</option>
-              <option value="Doces e Biscoitos">Doces e Biscoitos</option>
-
-              <option value="Pães">Pães</option>
-              <option value="Bolos e Tortas">Bolos e Tortas</option>
-              <option value="Salgados">Salgados</option>
-              <option value="Biscoitos Padaria">Biscoitos Padaria</option>
-              <option value="Café da Manhã">Café da Manhã</option>
-
-              <option value="Carnes Bovinas">Carnes Bovinas</option>
-              <option value="Carnes Suínas">Carnes Suínas</option>
-              <option value="Aves">Aves</option>
-              <option value="Peixes">Peixes</option>
-              <option value="Embutidos">Embutidos</option>
-              <option value="Cortes Especiais">Cortes Especiais</option>
-            </select>
+<label for="produtoCategoria">Categoria</label>
+<select id="produtoCategoria">
+  <option value="">Selecione o setor primeiro</option>
+</select>
             </div>
             <div class="field">
               <label for="produtoPreco">Preço</label>
@@ -495,6 +475,7 @@
     function limparFormularioProduto(){
       document.getElementById("produtoId").value = "";
       document.getElementById("produtoNome").value = "";
+      const setor = document.getElementById("produtoSetor").value;
       document.getElementById("produtoCategoria").value = "";
       document.getElementById("produtoPreco").value = "";
       document.getElementById("produtoDescricao").value = "";
@@ -504,6 +485,7 @@
     function salvarProduto(){
       const id = document.getElementById("produtoId").value.trim();
       const nome = document.getElementById("produtoNome").value.trim();
+      const setor = document.getElementById("produtoSetor").value;
       const categoria = document.getElementById("produtoCategoria").value;
       const preco = parseFloat(document.getElementById("produtoPreco").value);
       const descricao = document.getElementById("produtoDescricao").value.trim();
@@ -526,6 +508,7 @@
     function editarProduto(id, nome, categoria, preco, descricao, ativo){
       document.getElementById("produtoId").value = id;
       document.getElementById("produtoNome").value = nome || "";
+      const setor = document.getElementById("produtoSetor").value;
       document.getElementById("produtoCategoria").value = categoria || "";
       document.getElementById("produtoPreco").value = preco || "";
       document.getElementById("produtoDescricao").value = descricao || "";
@@ -554,7 +537,61 @@
         toast("Erro ao carregar produtos.");
       });
     }
+    const CATEGORIAS_POR_SETOR = {
+  Mercantil: [
+    "Mercearia",
+    "Bebidas",
+    "Laticínios",
+    "Frios",
+    "Higiene",
+    "Limpeza",
+    "Bazar",
+    "Enlatados",
+    "Matinais",
+    "Doces e Biscoitos"
+  ],
+  Padaria: [
+    "Pães",
+    "Bolos e Tortas",
+    "Salgados",
+    "Biscoitos Padaria",
+    "Café da Manhã"
+  ],
+  Açougue: [
+    "Carnes Bovinas",
+    "Carnes Suínas",
+    "Aves",
+    "Peixes",
+    "Embutidos",
+    "Cortes Especiais"
+  ]
+};
 
+function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
+  const setorEl = document.getElementById("produtoSetor");
+  const categoriaEl = document.getElementById("produtoCategoria");
+
+  if (!setorEl || !categoriaEl) return;
+
+  const setor = setorEl.value;
+  const categorias = CATEGORIAS_POR_SETOR[setor] || [];
+
+  categoriaEl.innerHTML = "";
+
+  const primeiraOpcao = document.createElement("option");
+  primeiraOpcao.value = "";
+  primeiraOpcao.textContent = setor ? "Selecione a categoria" : "Selecione o setor primeiro";
+  categoriaEl.appendChild(primeiraOpcao);
+
+  categorias.forEach(nome => {
+    const opt = document.createElement("option");
+    opt.value = nome;
+    opt.textContent = nome;
+    if (nome === categoriaSelecionada) opt.selected = true;
+    categoriaEl.appendChild(opt);
+  });
+} 
+    
     function renderProdutos(){
       const lista = document.getElementById("listaProdutos");
       const vazio = document.getElementById("emptyProdutos");
