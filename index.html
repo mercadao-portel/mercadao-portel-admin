@@ -249,17 +249,33 @@
             </div>
             <div class="field">
               <label for="produtoCategoria">Categoria</label>
-              <select id="produtoCategoria">
-                <option value="">Selecione</option>
-                <option value="Cafés">Cafés</option>
-                <option value="Biscoitos">Biscoitos</option>
-                <option value="Bebidas">Bebidas</option>
-                <option value="Massas">Massas</option>
-                <option value="Laticínios">Laticínios</option>
-                <option value="Enlatados">Enlatados</option>
-                <option value="Grãos e Cereais">Grãos e Cereais</option>
-                <option value="Congelados">Congelados</option>
-              </select>
+            <select id="produtoCategoria">
+              <option value="">Selecione</option>
+
+              <option value="Mercearia">Mercearia</option>
+              <option value="Bebidas">Bebidas</option>
+              <option value="Laticínios">Laticínios</option>
+              <option value="Frios">Frios</option>
+              <option value="Higiene">Higiene</option>
+              <option value="Limpeza">Limpeza</option>
+              <option value="Bazar">Bazar</option>
+              <option value="Enlatados">Enlatados</option>
+              <option value="Matinais">Matinais</option>
+              <option value="Doces e Biscoitos">Doces e Biscoitos</option>
+
+              <option value="Pães">Pães</option>
+              <option value="Bolos e Tortas">Bolos e Tortas</option>
+              <option value="Salgados">Salgados</option>
+              <option value="Biscoitos Padaria">Biscoitos Padaria</option>
+              <option value="Café da Manhã">Café da Manhã</option>
+
+              <option value="Carnes Bovinas">Carnes Bovinas</option>
+              <option value="Carnes Suínas">Carnes Suínas</option>
+              <option value="Aves">Aves</option>
+              <option value="Peixes">Peixes</option>
+              <option value="Embutidos">Embutidos</option>
+              <option value="Cortes Especiais">Cortes Especiais</option>
+            </select>
             </div>
             <div class="field">
               <label for="produtoPreco">Preço</label>
@@ -323,16 +339,32 @@
           <div class="toolbar">
             <input type="text" id="buscaProduto" placeholder="Buscar produto..." oninput="renderProdutos()" />
             <select id="filtroCategoriaProduto" onchange="renderProdutos()">
-              <option value="">Todas as categorias</option>
-              <option value="Cafés">Cafés</option>
-              <option value="Biscoitos">Biscoitos</option>
-              <option value="Bebidas">Bebidas</option>
-              <option value="Massas">Massas</option>
-              <option value="Laticínios">Laticínios</option>
-              <option value="Enlatados">Enlatados</option>
-              <option value="Grãos e Cereais">Grãos e Cereais</option>
-              <option value="Congelados">Congelados</option>
-            </select>
+  <option value="">Todas as categorias</option>
+
+  <option value="Mercearia">Mercearia</option>
+  <option value="Bebidas">Bebidas</option>
+  <option value="Laticínios">Laticínios</option>
+  <option value="Frios">Frios</option>
+  <option value="Higiene">Higiene</option>
+  <option value="Limpeza">Limpeza</option>
+  <option value="Bazar">Bazar</option>
+  <option value="Enlatados">Enlatados</option>
+  <option value="Matinais">Matinais</option>
+  <option value="Doces e Biscoitos">Doces e Biscoitos</option>
+
+  <option value="Pães">Pães</option>
+  <option value="Bolos e Tortas">Bolos e Tortas</option>
+  <option value="Salgados">Salgados</option>
+  <option value="Biscoitos Padaria">Biscoitos Padaria</option>
+  <option value="Café da Manhã">Café da Manhã</option>
+
+  <option value="Carnes Bovinas">Carnes Bovinas</option>
+  <option value="Carnes Suínas">Carnes Suínas</option>
+  <option value="Aves">Aves</option>
+  <option value="Peixes">Peixes</option>
+  <option value="Embutidos">Embutidos</option>
+  <option value="Cortes Especiais">Cortes Especiais</option>
+</select>
           </div>
 
           <div id="listaProdutos" class="products"></div>
