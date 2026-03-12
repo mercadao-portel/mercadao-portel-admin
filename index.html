@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Mercadão Portel</title>
+  <meta name="theme-color" content="#0f3f8c" />
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --bg:#eef3f8;
+      --panel:#ffffff;
+      --line:#dbe5f0;
+      --primary:#0f3f8c;
+      --primary-2:#1b63d1;
+      --dark:#122033;
+      --muted:#6b7b93;
+      --ok:#0e9f6e;
+      --warn:#f59e0b;
+      --danger:#dc2626;
+      --shadow:0 10px 28px rgba(15,35,68,.08);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:linear-gradient(180deg,#f4f7fb 0,#eef3f8 100%);color:var(--dark)}
+    body{min-height:100vh}
+    .hidden{display:none!important}
+    .login-shell{min-height:100vh;display:grid;place-items:center;padding:24px}
+    .login-card{
+      width:min(100%,1080px);display:grid;grid-template-columns:1.05fr .95fr;overflow:hidden;
+      background:var(--panel);border:1px solid var(--line);border-radius:28px;box-shadow:var(--shadow)
+    }
+    .hero{
+      background:linear-gradient(135deg,#0f3f8c,#1b63d1);color:#fff;padding:42px;display:flex;flex-direction:column;justify-content:space-between
+    }
+    .hero h1{font-size:38px;line-height:1.05;margin:0 0 10px}
+    .hero p{font-size:16px;line-height:1.6;opacity:.95;max-width:520px}
+    .hero-badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+    .hero-badges span{padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.18);font-size:13px}
+    .hero-foot{font-size:13px;opacity:.9;margin-top:30px}
+    .login-form{padding:34px}
+    .login-form h2{margin:4px 0 6px;font-size:28px}
+    .sub{margin:0 0 26px;color:var(--muted);line-height:1.5}
+    .field{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+    .field label{font-size:13px;color:var(--muted);font-weight:700}
+    .field input,.field select,.field textarea{
+      width:100%;padding:13px 14px;border:1px solid #cdd8e4;border-radius:14px;background:#fff;font-size:15px;outline:none
+    }
+    .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary-2);box-shadow:0 0 0 4px rgba(27,99,209,.12)}
+    .field textarea{min-height:110px;resize:vertical}
+    .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+    button{
+      border:none;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;transition:.18s ease;
+      box-shadow:0 4px 12px rgba(0,0,0,.06)
+    }
+    button:hover{transform:translateY(-1px)}
+    .btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-2));color:#fff}
+    .btn-secondary{background:#edf4ff;color:var(--primary)}
+    .btn-success{background:#e9fbf3;color:var(--ok)}
+    .btn-warning{background:#fff6e5;color:#b75a00}
+    .btn-danger{background:#ffe7e7;color:#b91c1c}
+    .btn-dark{background:#16263f;color:#fff}
+    .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
+    .sidebar{
+      background:linear-gradient(180deg,#12284b 0,#0f1f37 100%);color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh
+    }
+    .brand{padding:10px 12px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
+    .brand h1{margin:0;font-size:24px}
+    .brand p{margin:8px 0 0;color:rgba(255,255,255,.82);font-size:13px;line-height:1.5}
+    .nav{display:flex;flex-direction:column;gap:8px;margin-top:22px}
+    .nav button{
+      width:100%;text-align:left;background:transparent;color:#fff;border:1px solid transparent;box-shadow:none;padding:13px 14px;border-radius:14px
+    }
+    .nav button.active,.nav button:hover{background:rgba(255,255,255,.1);border-color:rgba(255,255,255,.12)}
+    .sidebar-foot{margin-top:auto;padding:16px 12px 0;border-top:1px solid rgba(255,255,255,.12);font-size:13px;color:rgba(255,255,255,.82)}
+    .main{padding:22px}
+    .topbar{
+      background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:16px 18px;
+      display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap
+    }
+    .topbar h2{margin:0;font-size:28px}
+    .topbar p{margin:4px 0 0;color:var(--muted)}
+    .user-chip{display:flex;align-items:center;gap:10px;background:#f5f8fc;border:1px solid var(--line);padding:10px 12px;border-radius:999px}
+    .dot{width:10px;height:10px;background:var(--ok);border-radius:999px}
+    .content{margin-top:18px;display:flex;flex-direction:column;gap:18px}
+    .cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+    .stat{
+      background:var(--panel);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);padding:18px
+    }
+    .stat .label{color:var(--muted);font-size:13px;font-weight:700;margin-bottom:10px}
+    .stat .value{font-size:32px;font-weight:800}
+    .stat .info{margin-top:8px;font-size:12px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}
+    .panel{
+      background:var(--panel);border:1px solid var(--line);border-radius:22px;box-shadow:var(--shadow);padding:18px
+    }
+    .panel h3{margin:0 0 4px;font-size:22px}
+    .panel .desc{margin:0 0 16px;color:var(--muted);line-height:1.5}
+    .toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 14px}
+    .toolbar input,.toolbar select{
+      border:1px solid #cdd8e4;border-radius:12px;padding:11px 12px;font-size:14px;min-width:180px
+    }
+    .products,.orders{display:grid;gap:12px}
+    .product-card,.order-card{
+      border:1px solid var(--line);border-radius:18px;padding:16px;background:#fbfdff
+    }
+    .product-card h4,.order-card h4{margin:0 0 8px;font-size:18px}
+    .meta{display:flex;gap:10px;flex-wrap:wrap;color:var(--muted);font-size:13px;margin-bottom:12px}
+    .pill{
+      display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700
+    }
+    .pill.cat{background:#edf4ff;color:var(--primary)}
+    .pill.ok{background:#e9fbf3;color:var(--ok)}
+    .pill.warn{background:#fff6e5;color:#b75a00}
+    .pill.off{background:#f2f4f7;color:#6b7280}
+    .actions{display:flex;gap:8px;flex-wrap:wrap}
+    .order-items{margin:12px 0 0;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid #edf1f6}
+    .order-items li{margin:6px 0}
+    .muted{color:var(--muted)}
+    .empty{
+      border:1px dashed #cfd8e3;border-radius:18px;padding:24px;text-align:center;color:var(--muted);background:#fbfdff
+    }
+    .toast{
+      position:fixed;right:20px;bottom:20px;z-index:99;background:#16263f;color:#fff;padding:14px 16px;border-radius:16px;
+      box-shadow:var(--shadow);opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s ease
+    }
+    .toast.show{opacity:1;transform:translateY(0)}
+    @media(max-width:1180px){
+      .cards{grid-template-columns:repeat(2,minmax(0,1fr))}
+      .grid{grid-template-columns:1fr}
+    }
+    @media(max-width:980px){
+      .login-card{grid-template-columns:1fr}
+      .app{grid-template-columns:1fr}
+      .sidebar{position:relative;height:auto}
+    }
+    @media(max-width:700px){
+      .main{padding:14px}
+      .cards{grid-template-columns:1fr}
+      .topbar h2{font-size:24px}
+      .hero{padding:30px}
+      .hero h1{font-size:30px}
+    }
+  </style>
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+
+  <section id="loginArea" class="login-shell">
+    <div class="login-card">
+      <div class="hero">
+        <div>
+          <h1>Admin - Mercadão Portel</h1>
+          <p>Painel moderno para cadastrar produtos, ajustar PIX e WhatsApp, acompanhar pedidos e administrar o app do cliente em tempo real via Firebase.</p>
+          <div class="hero-badges">
+            <span>Firebase Auth</span>
+            <span>Firestore em tempo real</span>
+            <span>PWA responsivo</span>
+          </div>
+        </div>
+        <div class="hero-foot">Seu mercado com visual profissional, pronto para celular e computador.</div>
+      </div>
+      <div class="login-form">
+        <h2>Acesso do administrador</h2>
+        <p class="sub">Entre com o mesmo usuário cadastrado no Firebase Authentication.</p>
+        <div class="field">
+          <label for="loginEmail">E-mail</label>
+          <input type="email" id="loginEmail" placeholder="admin@mercadaoportel.com" />
+        </div>
+        <div class="field">
+          <label for="loginSenha">Senha</label>
+          <input type="password" id="loginSenha" placeholder="Digite sua senha" />
+        </div>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="loginAdmin()">Entrar</button>
+          <button class="btn-secondary" onclick="redefinirSenha()">Esqueci a senha</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="adminArea" class="app hidden">
+    <aside class="sidebar">
+      <div class="brand">
+        <h1>Mercadão Portel</h1>
+        <p>Administração de catálogo, configurações e pedidos. Tudo interligado com o app do cliente.</p>
+      </div>
+
+      <nav class="nav">
+        <button class="active" onclick="rolarPara('dashboard')">Dashboard</button>
+        <button onclick="rolarPara('produtosSec')">Produtos</button>
+        <button onclick="rolarPara('configSec')">Configurações</button>
+        <button onclick="rolarPara('pedidosSec')">Pedidos</button>
+      </nav>
+
+      <div class="sidebar-foot">
+        <div id="usuarioLogado">Não autenticado</div>
+        <div style="margin-top:12px;">
+          <button class="btn-dark" style="width:100%" onclick="sairAdmin()">Sair</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <div class="topbar" id="dashboard">
+        <div>
+          <h2>Painel administrativo</h2>
+          <p>Gerencie seu mercado com uma interface mais bonita, rápida e pronta para instalar como app.</p>
+        </div>
+        <div class="user-chip">
+          <span class="dot"></span>
+          <span id="userChipText">Conectado</span>
+        </div>
+      </div>
+
+      <div class="content">
+        <section class="cards">
+          <div class="stat">
+            <div class="label">Produtos cadastrados</div>
+            <div class="value" id="statProdutos">0</div>
+            <div class="info">Itens disponíveis no catálogo</div>
+          </div>
+          <div class="stat">
+            <div class="label">Pedidos recebidos</div>
+            <div class="value" id="statPedidos">0</div>
+            <div class="info">Total de pedidos registrados</div>
+          </div>
+          <div class="stat">
+            <div class="label">Pagamentos pendentes</div>
+            <div class="value" id="statPendentes">0</div>
+            <div class="info">Pedidos aguardando pagamento</div>
+          </div>
+          <div class="stat">
+            <div class="label">Faturamento em pedidos</div>
+            <div class="value" id="statTotal">R$ 0,00</div>
+            <div class="info">Soma do campo total dos pedidos</div>
+          </div>
+        </section>
+
+        <section class="grid">
+          <div class="panel" id="produtosSec">
+            <h3>Cadastro de produtos</h3>
+            <p class="desc">Cadastre, edite e organize os itens exibidos no app do cliente.</p>
+
+            <input type="hidden" id="produtoId" />
+            <div class="field">
+              <label for="produtoNome">Nome do produto</label>
+              <input type="text" id="produtoNome" placeholder="Ex.: Café 250g" />
+            </div>
+            <div class="field">
+              <label for="produtoCategoria">Categoria</label>
+              <select id="produtoCategoria">
+                <option value="">Selecione</option>
+                <option value="Cafés">Cafés</option>
+                <option value="Biscoitos">Biscoitos</option>
+                <option value="Bebidas">Bebidas</option>
+                <option value="Massas">Massas</option>
+                <option value="Laticínios">Laticínios</option>
+                <option value="Enlatados">Enlatados</option>
+                <option value="Grãos e Cereais">Grãos e Cereais</option>
+                <option value="Congelados">Congelados</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="produtoPreco">Preço</label>
+              <input type="number" id="produtoPreco" step="0.01" min="0" placeholder="12,50" />
+            </div>
+            <div class="field">
+              <label for="produtoDescricao">Descrição (opcional)</label>
+              <textarea id="produtoDescricao" placeholder="Escreva uma descrição curta para exibir no app do cliente."></textarea>
+            </div>
+            <div class="field">
+              <label style="display:flex;align-items:center;gap:8px;">
+                <input type="checkbox" id="produtoAtivo" checked style="width:auto;transform:scale(1.15)" />
+                Produto ativo no catálogo
+              </label>
+            </div>
+            <div class="btn-row">
+              <button class="btn-primary" onclick="salvarProduto()">Salvar produto</button>
+              <button class="btn-secondary" onclick="limparFormularioProduto()">Limpar</button>
+            </div>
+          </div>
+
+          <div class="panel" id="configSec">
+            <h3>Configurações da loja</h3>
+            <p class="desc">Esses dados alimentam PIX, WhatsApp e detalhes da experiência do cliente.</p>
+
+            <div class="field">
+              <label for="configWhatsapp">WhatsApp da loja</label>
+              <input type="text" id="configWhatsapp" placeholder="5591999999999" />
+            </div>
+            <div class="field">
+              <label for="configPixPayload">PIX payload pronto (opcional)</label>
+              <textarea id="configPixPayload" placeholder="Cole aqui o código PIX pronto, se já tiver"></textarea>
+            </div>
+            <div class="field">
+              <label for="configPixChave">Chave PIX</label>
+              <input type="text" id="configPixChave" placeholder="CPF, e-mail, telefone ou chave aleatória" />
+            </div>
+            <div class="field">
+              <label for="configPixNome">Nome do recebedor</label>
+              <input type="text" id="configPixNome" placeholder="Mercadão Portel" />
+            </div>
+            <div class="field">
+              <label for="configPixCidade">Cidade do recebedor</label>
+              <input type="text" id="configPixCidade" placeholder="Portel" />
+            </div>
+            <div class="field">
+              <label for="configPixDescricao">Descrição PIX</label>
+              <input type="text" id="configPixDescricao" placeholder="MERCADAO PORTEL" />
+            </div>
+
+            <div class="btn-row">
+              <button class="btn-primary" onclick="salvarConfig()">Salvar configurações</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <h3>Produtos cadastrados</h3>
+          <p class="desc">Busque por nome, categoria ou preço e edite rapidamente.</p>
+
+          <div class="toolbar">
+            <input type="text" id="buscaProduto" placeholder="Buscar produto..." oninput="renderProdutos()" />
+            <select id="filtroCategoriaProduto" onchange="renderProdutos()">
+              <option value="">Todas as categorias</option>
+              <option value="Cafés">Cafés</option>
+              <option value="Biscoitos">Biscoitos</option>
+              <option value="Bebidas">Bebidas</option>
+              <option value="Massas">Massas</option>
+              <option value="Laticínios">Laticínios</option>
+              <option value="Enlatados">Enlatados</option>
+              <option value="Grãos e Cereais">Grãos e Cereais</option>
+              <option value="Congelados">Congelados</option>
+            </select>
+          </div>
+
+          <div id="listaProdutos" class="products"></div>
+          <div id="emptyProdutos" class="empty hidden">Nenhum produto encontrado.</div>
+        </section>
+
+        <section class="panel" id="pedidosSec">
+          <h3>Pedidos recebidos</h3>
+          <p class="desc">Visualize os pedidos em tempo real, filtre por status e marque pagamento.</p>
+
+          <div class="toolbar">
+            <input type="text" id="buscaPedido" placeholder="Buscar por cliente ou telefone..." oninput="renderPedidos()" />
+            <select id="filtroStatusPedido" onchange="renderPedidos()">
+              <option value="">Todos os status</option>
+              <option value="Pago">Pago</option>
+              <option value="Aguardando">Aguardando pagamento</option>
+            </select>
+          </div>
+
+          <div id="listaPedidos" class="orders"></div>
+          <div id="emptyPedidos" class="empty hidden">Nenhum pedido encontrado.</div>
+        </section>
+      </div>
+    </main>
+  </section>
+
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyADEkaUZHX93hdLBL_bQfQcJV_iHWHFxgg",
+      authDomain: "meu-e-commerce-e4f70.firebaseapp.com",
+      projectId: "meu-e-commerce-e4f70",
+      storageBucket: "meu-e-commerce-e4f70.firebasestorage.app",
+      messagingSenderId: "674482543537",
+      appId: "1:674482543537:web:a09acd35107bde4b74fb90"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    let produtosCache = [];
+    let pedidosCache = [];
+    let unsubscribeProdutos = null;
+    let unsubscribePedidos = null;
+
+    function toast(msg){
+      const el = document.getElementById('toast');
+      el.textContent = msg;
+      el.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+    }
+
+    function formatarReais(valor){
+      return Number(valor || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+    }
+
+    function formatarData(ts){
+      if(!ts) return 'Sem data';
+      try{
+        const data = ts.toDate ? ts.toDate() : new Date(ts);
+        return data.toLocaleString('pt-BR');
+      }catch{
+        return 'Sem data';
+      }
+    }
+
+    function loginAdmin(){
+      const email = document.getElementById("loginEmail").value.trim();
+      const senha = document.getElementById("loginSenha").value.trim();
+      if(!email || !senha){
+        toast("Preencha e-mail e senha.");
+        return;
+      }
+      auth.signInWithEmailAndPassword(email, senha)
+        .then(() => toast("Login realizado com sucesso."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro no login.");
+        });
+    }
+
+    function redefinirSenha(){
+      const email = document.getElementById("loginEmail").value.trim();
+      if(!email){
+        toast("Digite o e-mail para redefinir a senha.");
+        return;
+      }
+      auth.sendPasswordResetEmail(email)
+        .then(() => toast("E-mail de redefinição enviado."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao enviar redefinição.");
+        });
+    }
+
+    function sairAdmin(){
+      auth.signOut()
+        .then(() => toast("Sessão encerrada."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao sair.");
+        });
+    }
+
+    auth.onAuthStateChanged((user) => {
+      const loginArea = document.getElementById("loginArea");
+      const adminArea = document.getElementById("adminArea");
+      if(user){
+        loginArea.classList.add("hidden");
+        adminArea.classList.remove("hidden");
+        document.getElementById("usuarioLogado").textContent = "Logado como: " + user.email;
+        document.getElementById("userChipText").textContent = user.email;
+        carregarProdutos();
+        carregarConfig();
+        carregarPedidos();
+      }else{
+        loginArea.classList.remove("hidden");
+        adminArea.classList.add("hidden");
+        document.getElementById("usuarioLogado").textContent = "Não autenticado";
+        document.getElementById("userChipText").textContent = "Desconectado";
+      }
+    });
+
+    function limparFormularioProduto(){
+      document.getElementById("produtoId").value = "";
+      document.getElementById("produtoNome").value = "";
+      document.getElementById("produtoCategoria").value = "";
+      document.getElementById("produtoPreco").value = "";
+      document.getElementById("produtoDescricao").value = "";
+      document.getElementById("produtoAtivo").checked = true;
+    }
+
+    function salvarProduto(){
+      const id = document.getElementById("produtoId").value.trim();
+      const nome = document.getElementById("produtoNome").value.trim();
+      const categoria = document.getElementById("produtoCategoria").value;
+      const preco = parseFloat(document.getElementById("produtoPreco").value);
+      const descricao = document.getElementById("produtoDescricao").value.trim();
+      const ativo = document.getElementById("produtoAtivo").checked;
+      if(!nome || !categoria || isNaN(preco) || preco < 0){
+        toast("Preencha nome, categoria e preço corretamente.");
+        return;
+      }
+      const dados = { nome, categoria, preco, descricao, ativo };
+      const op = id ? db.collection("produtos").doc(id).update(dados) : db.collection("produtos").add(dados);
+      op.then(() => {
+        toast(id ? "Produto atualizado com sucesso." : "Produto cadastrado com sucesso.");
+        limparFormularioProduto();
+      }).catch((error) => {
+        console.error(error);
+        toast("Erro ao salvar produto.");
+      });
+    }
+
+    function editarProduto(id, nome, categoria, preco, descricao, ativo){
+      document.getElementById("produtoId").value = id;
+      document.getElementById("produtoNome").value = nome || "";
+      document.getElementById("produtoCategoria").value = categoria || "";
+      document.getElementById("produtoPreco").value = preco || "";
+      document.getElementById("produtoDescricao").value = descricao || "";
+      document.getElementById("produtoAtivo").checked = ativo !== false;
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+
+    function excluirProduto(id){
+      if(!confirm("Deseja realmente excluir este produto?")) return;
+      db.collection("produtos").doc(id).delete()
+        .then(() => toast("Produto excluído com sucesso."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao excluir produto.");
+        });
+    }
+
+    function carregarProdutos(){
+      if(unsubscribeProdutos) unsubscribeProdutos();
+      unsubscribeProdutos = db.collection("produtos").onSnapshot((snapshot) => {
+        produtosCache = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+        renderProdutos();
+        atualizarResumo();
+      }, (error) => {
+        console.error(error);
+        toast("Erro ao carregar produtos.");
+      });
+    }
+
+    function renderProdutos(){
+      const lista = document.getElementById("listaProdutos");
+      const vazio = document.getElementById("emptyProdutos");
+      const busca = document.getElementById("buscaProduto").value.trim().toLowerCase();
+      const categoria = document.getElementById("filtroCategoriaProduto").value;
+
+      const filtrados = produtosCache.filter((p) => {
+        const atendeBusca =
+          !busca ||
+          (p.nome || "").toLowerCase().includes(busca) ||
+          (p.categoria || "").toLowerCase().includes(busca) ||
+          String(p.preco || "").includes(busca);
+        const atendeCategoria = !categoria || p.categoria === categoria;
+        return atendeBusca && atendeCategoria;
+      }).sort((a,b) => (a.nome || "").localeCompare(b.nome || "", 'pt-BR'));
+
+      lista.innerHTML = "";
+      vazio.classList.toggle("hidden", filtrados.length > 0);
+
+      filtrados.forEach((p) => {
+        const item = document.createElement("div");
+        item.className = "product-card";
+        item.innerHTML = `
+          <h4>${p.nome || ""}</h4>
+          <div class="meta">
+            <span class="pill cat">${p.categoria || "Sem categoria"}</span>
+            <span class="pill ${p.ativo === false ? 'off' : 'ok'}">${p.ativo === false ? 'Inativo' : 'Ativo'}</span>
+          </div>
+          <div><strong>Preço:</strong> ${formatarReais(p.preco || 0)}</div>
+          <div class="muted" style="margin-top:8px;">${p.descricao ? p.descricao : "Sem descrição cadastrada."}</div>
+          <div class="actions" style="margin-top:14px;">
+            <button class="btn-warning" onclick="editarProduto('${p.id}', ${JSON.stringify(p.nome || "")}, ${JSON.stringify(p.categoria || "")}, '${p.preco || 0}', ${JSON.stringify(p.descricao || "")}, ${p.ativo === false ? 'false' : 'true'})">Editar</button>
+            <button class="btn-danger" onclick="excluirProduto('${p.id}')">Excluir</button>
+          </div>
+        `;
+        lista.appendChild(item);
+      });
+    }
+
+    function carregarConfig(){
+      db.collection("config").doc("main").get()
+        .then((doc) => {
+          if(!doc.exists) return;
+          const c = doc.data();
+          document.getElementById("configWhatsapp").value = c.whatsapp || "";
+          document.getElementById("configPixPayload").value = c.pixPayload || c.payloadPix || c.pixCopiaCola || c.copiaColaPix || "";
+          document.getElementById("configPixChave").value = c.pixChave || c.chavePix || c.pix || "";
+          document.getElementById("configPixNome").value = c.pixNome || c.nomePix || c.nomeRecebedor || "";
+          document.getElementById("configPixCidade").value = c.pixCidade || c.cidadePix || c.cidadeRecebedor || "";
+          document.getElementById("configPixDescricao").value = c.pixDescricao || c.descricaoPix || "MERCADAO PORTEL";
+        })
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao carregar configurações.");
+        });
+    }
+
+    function salvarConfig(){
+      const dados = {
+        whatsapp: document.getElementById("configWhatsapp").value.trim(),
+        pixPayload: document.getElementById("configPixPayload").value.trim(),
+        pixChave: document.getElementById("configPixChave").value.trim(),
+        pixNome: document.getElementById("configPixNome").value.trim(),
+        pixCidade: document.getElementById("configPixCidade").value.trim(),
+        pixDescricao: document.getElementById("configPixDescricao").value.trim()
+      };
+      db.collection("config").doc("main").set(dados, { merge: true })
+        .then(() => toast("Configurações salvas com sucesso."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao salvar configurações.");
+        });
+    }
+
+    function carregarPedidos(){
+      if(unsubscribePedidos) unsubscribePedidos();
+      unsubscribePedidos = db.collection("pedidos").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
+        pedidosCache = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+        renderPedidos();
+        atualizarResumo();
+      }, (error) => {
+        console.error(error);
+        toast("Erro ao carregar pedidos.");
+      });
+    }
+
+    function renderPedidos(){
+      const lista = document.getElementById("listaPedidos");
+      const vazio = document.getElementById("emptyPedidos");
+      const busca = document.getElementById("buscaPedido").value.trim().toLowerCase();
+      const filtroStatus = document.getElementById("filtroStatusPedido").value;
+
+      const filtrados = pedidosCache.filter((p) => {
+        const nome = (p.nome || "").toLowerCase();
+        const telefone = (p.telefone || "").toLowerCase();
+        const status = (p.status || "");
+        const atendeBusca = !busca || nome.includes(busca) || telefone.includes(busca);
+        const atendeStatus = !filtroStatus || status.includes(filtroStatus);
+        return atendeBusca && atendeStatus;
+      });
+
+      lista.innerHTML = "";
+      vazio.classList.toggle("hidden", filtrados.length > 0);
+
+      filtrados.forEach((p) => {
+        const statusPago = (p.status || "").toLowerCase().includes("pago");
+        const entregaTexto = p.entrega === "barco"
+          ? `Barco: ${p.nomeBarco || ""} | Vila: ${p.nomeVila || ""}`
+          : (p.entrega || "Não informado");
+        const produtosHtml = (p.produtos || []).map(item => {
+          const subtotal = Number(item.preco || 0) * Number(item.quantidade || 0);
+          return `<li>${item.nome || ""} x ${item.quantidade || 0} - ${formatarReais(subtotal)}</li>`;
+        }).join("");
+
+        const card = document.createElement("div");
+        card.className = "order-card";
+        card.innerHTML = `
+          <div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start;">
+            <div>
+              <h4>${p.nome || "Cliente sem nome"}</h4>
+              <div class="meta">
+                <span class="pill ${statusPago ? 'ok' : 'warn'}">${p.status || "Sem status"}</span>
+                <span class="pill cat">+${p.telefone || ""}</span>
+                <span class="pill cat">${p.entrega || "Entrega não informada"}</span>
+              </div>
+            </div>
+            <div style="font-size:24px;font-weight:800">${formatarReais(p.total || 0)}</div>
+          </div>
+          <div><strong>Entrega:</strong> ${entregaTexto}</div>
+          <div class="muted" style="margin-top:6px;"><strong>Recebido em:</strong> ${formatarData(p.timestamp)}</div>
+          <div class="order-items">
+            <strong>Produtos do pedido</strong>
+            <ul>${produtosHtml || "<li>Nenhum item</li>"}</ul>
+          </div>
+          <div class="actions" style="margin-top:12px;">
+            <button class="btn-success" onclick="atualizarStatusPedido('${p.id}','Pago')">Marcar como pago</button>
+            <button class="btn-secondary" onclick="atualizarStatusPedido('${p.id}','Aguardando pagamento')">Voltar para aguardando</button>
+          </div>
+        `;
+        lista.appendChild(card);
+      });
+    }
+
+    function atualizarStatusPedido(id, status){
+      db.collection("pedidos").doc(id).set({ status }, { merge: true })
+        .then(() => toast("Status atualizado com sucesso."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao atualizar status.");
+        });
+    }
+
+    function atualizarResumo(){
+      document.getElementById("statProdutos").textContent = produtosCache.length;
+      document.getElementById("statPedidos").textContent = pedidosCache.length;
+      const pendentes = pedidosCache.filter(p => !(p.status || "").toLowerCase().includes("pago")).length;
+      document.getElementById("statPendentes").textContent = pendentes;
+      const total = pedidosCache.reduce((s,p) => s + Number(p.total || 0), 0);
+      document.getElementById("statTotal").textContent = formatarReais(total);
+    }
+
+    function rolarPara(id){
+      document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+      const sec = document.getElementById(id);
+      if(sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
+      const btn = Array.from(document.querySelectorAll('.nav button')).find(b => {
+        const fn = b.getAttribute('onclick') || '';
+        return fn.includes(id);
+      });
+      if(btn) btn.classList.add('active');
+    }
+
+    if('serviceWorker' in navigator){
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+      });
+    }
+  </script>
+</body>
+</html>
