@@ -18,6 +18,7 @@
       --ok:#0e9f6e;
       --warn:#f59e0b;
       --danger:#dc2626;
+      --info:#2563eb;
       --shadow:0 10px 28px rgba(15,35,68,.08);
       --radius:18px;
     }
@@ -48,6 +49,7 @@
     }
     .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--primary-2);box-shadow:0 0 0 4px rgba(27,99,209,.12)}
     .field textarea{min-height:110px;resize:vertical}
+    .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
     .btn-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
     button{
       border:none;border-radius:14px;padding:12px 16px;font-size:14px;font-weight:700;cursor:pointer;transition:.18s ease;
@@ -60,9 +62,10 @@
     .btn-warning{background:#fff6e5;color:#b75a00}
     .btn-danger{background:#ffe7e7;color:#b91c1c}
     .btn-dark{background:#16263f;color:#fff}
+    .btn-info{background:#eaf1ff;color:#1d4ed8}
     .app{display:grid;grid-template-columns:280px 1fr;min-height:100vh}
     .sidebar{
-      background:linear-gradient(180deg,#12284b 0,#0f1f37 100%);color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh
+      background:linear-gradient(180deg,#12284b 0,#0f1f37 100%);color:#fff;padding:24px 18px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column
     }
     .brand{padding:10px 12px 18px;border-bottom:1px solid rgba(255,255,255,.12)}
     .brand h1{margin:0;font-size:24px}
@@ -110,9 +113,11 @@
       display:inline-flex;align-items:center;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700
     }
     .pill.cat{background:#edf4ff;color:var(--primary)}
+    .pill.sec{background:#eef9f4;color:#0b7a53}
     .pill.ok{background:#e9fbf3;color:var(--ok)}
     .pill.warn{background:#fff6e5;color:#b75a00}
     .pill.off{background:#f2f4f7;color:#6b7280}
+    .pill.info{background:#eef2ff;color:#4338ca}
     .actions{display:flex;gap:8px;flex-wrap:wrap}
     .order-items{margin:12px 0 0;padding:12px 14px;border-radius:16px;background:#fff;border:1px solid #edf1f6}
     .order-items li{margin:6px 0}
@@ -140,6 +145,7 @@
       .topbar h2{font-size:24px}
       .hero{padding:30px}
       .hero h1{font-size:30px}
+      .field-row{grid-template-columns:1fr}
     }
   </style>
 </head>
@@ -243,34 +249,48 @@
             <p class="desc">Cadastre, edite e organize os itens exibidos no app do cliente.</p>
 
             <input type="hidden" id="produtoId" />
-            <div class="field">
-              <label for="produtoSetor">Setor</label>
-<select id="produtoSetor" onchange="atualizarCategoriasPorSetor()">
-  <option value="">Selecione o setor</option>
-  <option value="Mercantil">Mercantil</option>
-  <option value="Padaria">Padaria</option>
-  <option value="Açougue">Açougue</option>
-</select>
 
-<label for="produtoCategoria">Categoria</label>
-<select id="produtoCategoria">
-  <option value="">Selecione o setor primeiro</option>
-</select>
+            <div class="field">
+              <label for="produtoNome">Nome do produto</label>
+              <input type="text" id="produtoNome" placeholder="Ex.: Café Líder 250g" />
             </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="produtoSetor">Setor</label>
+                <select id="produtoSetor" onchange="atualizarCategoriasPorSetor()">
+                  <option value="">Selecione o setor</option>
+                  <option value="Mercantil">Mercantil</option>
+                  <option value="Padaria">Padaria</option>
+                  <option value="Açougue">Açougue</option>
+                </select>
+              </div>
+
+              <div class="field">
+                <label for="produtoCategoria">Categoria</label>
+                <select id="produtoCategoria">
+                  <option value="">Selecione o setor primeiro</option>
+                </select>
+              </div>
+            </div>
+
             <div class="field">
               <label for="produtoPreco">Preço</label>
               <input type="number" id="produtoPreco" step="0.01" min="0" placeholder="12,50" />
             </div>
+
             <div class="field">
               <label for="produtoDescricao">Descrição (opcional)</label>
               <textarea id="produtoDescricao" placeholder="Escreva uma descrição curta para exibir no app do cliente."></textarea>
             </div>
+
             <div class="field">
               <label style="display:flex;align-items:center;gap:8px;">
                 <input type="checkbox" id="produtoAtivo" checked style="width:auto;transform:scale(1.15)" />
                 Produto ativo no catálogo
               </label>
             </div>
+
             <div class="btn-row">
               <button class="btn-primary" onclick="salvarProduto()">Salvar produto</button>
               <button class="btn-secondary" onclick="limparFormularioProduto()">Limpar</button>
@@ -314,37 +334,20 @@
 
         <section class="panel">
           <h3>Produtos cadastrados</h3>
-          <p class="desc">Busque por nome, categoria ou preço e edite rapidamente.</p>
+          <p class="desc">Busque por nome, setor, categoria ou preço e edite rapidamente.</p>
 
           <div class="toolbar">
             <input type="text" id="buscaProduto" placeholder="Buscar produto..." oninput="renderProdutos()" />
+            <select id="filtroSetorProduto" onchange="atualizarFiltroCategoriaProduto(); renderProdutos()">
+              <option value="">Todos os setores</option>
+              <option value="Mercantil">Mercantil</option>
+              <option value="Padaria">Padaria</option>
+              <option value="Açougue">Açougue</option>
+            </select>
             <select id="filtroCategoriaProduto" onchange="renderProdutos()">
-  <option value="">Todas as categorias</option>
-
-  <option value="Mercearia">Mercearia</option>
-  <option value="Bebidas">Bebidas</option>
-  <option value="Laticínios">Laticínios</option>
-  <option value="Frios">Frios</option>
-  <option value="Higiene">Higiene</option>
-  <option value="Limpeza">Limpeza</option>
-  <option value="Bazar">Bazar</option>
-  <option value="Enlatados">Enlatados</option>
-  <option value="Matinais">Matinais</option>
-  <option value="Doces e Biscoitos">Doces e Biscoitos</option>
-
-  <option value="Pães">Pães</option>
-  <option value="Bolos e Tortas">Bolos e Tortas</option>
-  <option value="Salgados">Salgados</option>
-  <option value="Biscoitos Padaria">Biscoitos Padaria</option>
-  <option value="Café da Manhã">Café da Manhã</option>
-
-  <option value="Carnes Bovinas">Carnes Bovinas</option>
-  <option value="Carnes Suínas">Carnes Suínas</option>
-  <option value="Aves">Aves</option>
-  <option value="Peixes">Peixes</option>
-  <option value="Embutidos">Embutidos</option>
-  <option value="Cortes Especiais">Cortes Especiais</option>
-</select>
+              <option value="">Todas as categorias</option>
+            </select>
+            <button class="btn-secondary" onclick="padronizarCategoriasAntigas()">Padronizar categorias antigas</button>
           </div>
 
           <div id="listaProdutos" class="products"></div>
@@ -353,7 +356,7 @@
 
         <section class="panel" id="pedidosSec">
           <h3>Pedidos recebidos</h3>
-          <p class="desc">Visualize os pedidos em tempo real, filtre por status e marque pagamento.</p>
+          <p class="desc">Visualize os pedidos em tempo real, filtre por status, confirme pagamento, entregue e exclua ao final do dia.</p>
 
           <div class="toolbar">
             <input type="text" id="buscaPedido" placeholder="Buscar por cliente ou telefone..." oninput="renderPedidos()" />
@@ -361,7 +364,9 @@
               <option value="">Todos os status</option>
               <option value="Pago">Pago</option>
               <option value="Aguardando">Aguardando pagamento</option>
+              <option value="Entregue">Entregue</option>
             </select>
+            <button class="btn-danger" onclick="excluirPedidosEntregues()">Excluir pedidos entregues</button>
           </div>
 
           <div id="listaPedidos" class="orders"></div>
@@ -393,26 +398,118 @@
     let unsubscribeProdutos = null;
     let unsubscribePedidos = null;
 
+    const CATEGORIAS_POR_SETOR = {
+      Mercantil: ["Mercearia","Bebidas","Laticínios","Frios","Higiene","Limpeza","Bazar","Enlatados","Matinais","Doces e Biscoitos"],
+      Padaria: ["Pães","Bolos e Tortas","Salgados","Biscoitos Padaria","Café da Manhã"],
+      Açougue: ["Carnes Bovinas","Carnes Suínas","Aves","Peixes","Embutidos","Cortes Especiais"]
+    };
+
+    const MAPEAMENTO_LEGADO = {
+      "Cafés": { setor: "Mercantil", categoria: "Matinais" },
+      "Biscoitos": { setor: "Mercantil", categoria: "Doces e Biscoitos" },
+      "Bebidas": { setor: "Mercantil", categoria: "Bebidas" },
+      "Massas": { setor: "Mercantil", categoria: "Mercearia" },
+      "Laticínios": { setor: "Mercantil", categoria: "Laticínios" },
+      "Enlatados": { setor: "Mercantil", categoria: "Enlatados" },
+      "Grãos e Cereais": { setor: "Mercantil", categoria: "Mercearia" },
+      "Congelados": { setor: "Mercantil", categoria: "Frios" },
+      "Limpeza": { setor: "Mercantil", categoria: "Limpeza" },
+      "Higiene": { setor: "Mercantil", categoria: "Higiene" }
+    };
+
     function toast(msg){
-      const el = document.getElementById('toast');
+      const el = document.getElementById("toast");
       el.textContent = msg;
-      el.classList.add('show');
+      el.classList.add("show");
       clearTimeout(window.__toastTimer);
-      window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2400);
+      window.__toastTimer = setTimeout(() => el.classList.remove("show"), 2400);
     }
 
     function formatarReais(valor){
-      return Number(valor || 0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+      return Number(valor || 0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
     }
 
     function formatarData(ts){
-      if(!ts) return 'Sem data';
+      if(!ts) return "Sem data";
       try{
         const data = ts.toDate ? ts.toDate() : new Date(ts);
-        return data.toLocaleString('pt-BR');
+        return data.toLocaleString("pt-BR");
       }catch{
-        return 'Sem data';
+        return "Sem data";
       }
+    }
+
+    function obterTodasCategoriasOficiais(){
+      return Object.values(CATEGORIAS_POR_SETOR).flat();
+    }
+
+    function normalizarCategoriaSetor(setor = "", categoria = ""){
+      const setorLimpo = String(setor || "").trim();
+      const categoriaLimpa = String(categoria || "").trim();
+
+      if (setorLimpo && CATEGORIAS_POR_SETOR[setorLimpo]?.includes(categoriaLimpa)) {
+        return { setor: setorLimpo, categoria: categoriaLimpa };
+      }
+
+      if (!setorLimpo && categoriaLimpa) {
+        for (const [setorNome, categorias] of Object.entries(CATEGORIAS_POR_SETOR)) {
+          if (categorias.includes(categoriaLimpa)) {
+            return { setor: setorNome, categoria: categoriaLimpa };
+          }
+        }
+      }
+
+      if (MAPEAMENTO_LEGADO[categoriaLimpa]) {
+        return MAPEAMENTO_LEGADO[categoriaLimpa];
+      }
+
+      return { setor: setorLimpo, categoria: categoriaLimpa };
+    }
+
+    function normalizarProduto(produto){
+      const normalizado = normalizarCategoriaSetor(produto.setor, produto.categoria);
+      return { ...produto, setor: normalizado.setor || "", categoria: normalizado.categoria || "" };
+    }
+
+    function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
+      const setorEl = document.getElementById("produtoSetor");
+      const categoriaEl = document.getElementById("produtoCategoria");
+      if (!setorEl || !categoriaEl) return;
+
+      const setor = setorEl.value;
+      const categorias = CATEGORIAS_POR_SETOR[setor] || [];
+
+      categoriaEl.innerHTML = "";
+
+      const primeiraOpcao = document.createElement("option");
+      primeiraOpcao.value = "";
+      primeiraOpcao.textContent = setor ? "Selecione a categoria" : "Selecione o setor primeiro";
+      categoriaEl.appendChild(primeiraOpcao);
+
+      categorias.forEach(nome => {
+        const opt = document.createElement("option");
+        opt.value = nome;
+        opt.textContent = nome;
+        if (nome === categoriaSelecionada) opt.selected = true;
+        categoriaEl.appendChild(opt);
+      });
+    }
+
+    function atualizarFiltroCategoriaProduto(categoriaSelecionada = ""){
+      const setor = document.getElementById("filtroSetorProduto")?.value || "";
+      const categoriaEl = document.getElementById("filtroCategoriaProduto");
+      if (!categoriaEl) return;
+
+      const categorias = setor ? (CATEGORIAS_POR_SETOR[setor] || []) : obterTodasCategoriasOficiais();
+
+      categoriaEl.innerHTML = '<option value="">Todas as categorias</option>';
+      categorias.forEach(nome => {
+        const opt = document.createElement("option");
+        opt.value = nome;
+        opt.textContent = nome;
+        if (nome === categoriaSelecionada) opt.selected = true;
+        categoriaEl.appendChild(opt);
+      });
     }
 
     function loginAdmin(){
@@ -456,15 +553,22 @@
     auth.onAuthStateChanged((user) => {
       const loginArea = document.getElementById("loginArea");
       const adminArea = document.getElementById("adminArea");
+
       if(user){
         loginArea.classList.add("hidden");
         adminArea.classList.remove("hidden");
         document.getElementById("usuarioLogado").textContent = "Logado como: " + user.email;
         document.getElementById("userChipText").textContent = user.email;
+        atualizarCategoriasPorSetor();
+        atualizarFiltroCategoriaProduto();
         carregarProdutos();
         carregarConfig();
         carregarPedidos();
       }else{
+        if (unsubscribeProdutos) { unsubscribeProdutos(); unsubscribeProdutos = null; }
+        if (unsubscribePedidos) { unsubscribePedidos(); unsubscribePedidos = null; }
+        produtosCache = [];
+        pedidosCache = [];
         loginArea.classList.remove("hidden");
         adminArea.classList.add("hidden");
         document.getElementById("usuarioLogado").textContent = "Não autenticado";
@@ -475,8 +579,8 @@
     function limparFormularioProduto(){
       document.getElementById("produtoId").value = "";
       document.getElementById("produtoNome").value = "";
-      const setor = document.getElementById("produtoSetor").value;
-      document.getElementById("produtoCategoria").value = "";
+      document.getElementById("produtoSetor").value = "";
+      atualizarCategoriasPorSetor();
       document.getElementById("produtoPreco").value = "";
       document.getElementById("produtoDescricao").value = "";
       document.getElementById("produtoAtivo").checked = true;
@@ -490,12 +594,18 @@
       const preco = parseFloat(document.getElementById("produtoPreco").value);
       const descricao = document.getElementById("produtoDescricao").value.trim();
       const ativo = document.getElementById("produtoAtivo").checked;
-      if(!nome || !categoria || isNaN(preco) || preco < 0){
-        toast("Preencha nome, categoria e preço corretamente.");
+
+      if(!nome || !setor || !categoria || isNaN(preco) || preco < 0){
+        toast("Preencha nome, setor, categoria e preço corretamente.");
         return;
       }
-      const dados = { nome, categoria, preco, descricao, ativo };
-      const op = id ? db.collection("produtos").doc(id).update(dados) : db.collection("produtos").add(dados);
+
+      const dados = { nome, setor, categoria, preco, descricao, ativo };
+
+      const op = id
+        ? db.collection("produtos").doc(id).update(dados)
+        : db.collection("produtos").add(dados);
+
       op.then(() => {
         toast(id ? "Produto atualizado com sucesso." : "Produto cadastrado com sucesso.");
         limparFormularioProduto();
@@ -505,14 +615,20 @@
       });
     }
 
-    function editarProduto(id, nome, categoria, preco, descricao, ativo){
-      document.getElementById("produtoId").value = id;
-      document.getElementById("produtoNome").value = nome || "";
-      const setor = document.getElementById("produtoSetor").value;
-      document.getElementById("produtoCategoria").value = categoria || "";
-      document.getElementById("produtoPreco").value = preco || "";
-      document.getElementById("produtoDescricao").value = descricao || "";
-      document.getElementById("produtoAtivo").checked = ativo !== false;
+    function editarProduto(id){
+      const produto = produtosCache.find(p => p.id === id);
+      if(!produto){
+        toast("Produto não encontrado.");
+        return;
+      }
+      const p = normalizarProduto(produto);
+      document.getElementById("produtoId").value = p.id;
+      document.getElementById("produtoNome").value = p.nome || "";
+      document.getElementById("produtoSetor").value = p.setor || "";
+      atualizarCategoriasPorSetor(p.categoria || "");
+      document.getElementById("produtoPreco").value = p.preco || "";
+      document.getElementById("produtoDescricao").value = p.descricao || "";
+      document.getElementById("produtoAtivo").checked = p.ativo !== false;
       window.scrollTo({top:0, behavior:"smooth"});
     }
 
@@ -526,10 +642,53 @@
         });
     }
 
+    async function padronizarCategoriasAntigas(){
+      if(!produtosCache.length){
+        toast("Não há produtos para padronizar.");
+        return;
+      }
+      if(!confirm("Deseja corrigir automaticamente categorias antigas dos produtos?")){
+        return;
+      }
+
+      try{
+        const batch = db.batch();
+        let alterados = 0;
+
+        produtosCache.forEach((produto) => {
+          const normalizado = normalizarCategoriaSetor(produto.setor, produto.categoria);
+          const setorAtual = String(produto.setor || "").trim();
+          const categoriaAtual = String(produto.categoria || "").trim();
+
+          if (normalizado.setor !== setorAtual || normalizado.categoria !== categoriaAtual) {
+            const ref = db.collection("produtos").doc(produto.id);
+            batch.set(ref, {
+              setor: normalizado.setor,
+              categoria: normalizado.categoria
+            }, { merge: true });
+            alterados++;
+          }
+        });
+
+        if(!alterados){
+          toast("Nenhum produto precisava ser corrigido.");
+          return;
+        }
+
+        await batch.commit();
+        toast(alterados + " produto(s) padronizado(s).");
+      }catch(error){
+        console.error(error);
+        toast("Erro ao padronizar categorias.");
+      }
+    }
+
     function carregarProdutos(){
       if(unsubscribeProdutos) unsubscribeProdutos();
+
       unsubscribeProdutos = db.collection("produtos").onSnapshot((snapshot) => {
-        produtosCache = snapshot.docs.map((doc) => ({id: doc.id, ...doc.data()}));
+        produtosCache = snapshot.docs.map((doc) => normalizarProduto({id: doc.id, ...doc.data()}));
+        atualizarFiltroCategoriaProduto(document.getElementById("filtroCategoriaProduto")?.value || "");
         renderProdutos();
         atualizarResumo();
       }, (error) => {
@@ -537,93 +696,46 @@
         toast("Erro ao carregar produtos.");
       });
     }
-    const CATEGORIAS_POR_SETOR = {
-  Mercantil: [
-    "Mercearia",
-    "Bebidas",
-    "Laticínios",
-    "Frios",
-    "Higiene",
-    "Limpeza",
-    "Bazar",
-    "Enlatados",
-    "Matinais",
-    "Doces e Biscoitos"
-  ],
-  Padaria: [
-    "Pães",
-    "Bolos e Tortas",
-    "Salgados",
-    "Biscoitos Padaria",
-    "Café da Manhã"
-  ],
-  Açougue: [
-    "Carnes Bovinas",
-    "Carnes Suínas",
-    "Aves",
-    "Peixes",
-    "Embutidos",
-    "Cortes Especiais"
-  ]
-};
 
-function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
-  const setorEl = document.getElementById("produtoSetor");
-  const categoriaEl = document.getElementById("produtoCategoria");
-
-  if (!setorEl || !categoriaEl) return;
-
-  const setor = setorEl.value;
-  const categorias = CATEGORIAS_POR_SETOR[setor] || [];
-
-  categoriaEl.innerHTML = "";
-
-  const primeiraOpcao = document.createElement("option");
-  primeiraOpcao.value = "";
-  primeiraOpcao.textContent = setor ? "Selecione a categoria" : "Selecione o setor primeiro";
-  categoriaEl.appendChild(primeiraOpcao);
-
-  categorias.forEach(nome => {
-    const opt = document.createElement("option");
-    opt.value = nome;
-    opt.textContent = nome;
-    if (nome === categoriaSelecionada) opt.selected = true;
-    categoriaEl.appendChild(opt);
-  });
-} 
-    
     function renderProdutos(){
       const lista = document.getElementById("listaProdutos");
       const vazio = document.getElementById("emptyProdutos");
       const busca = document.getElementById("buscaProduto").value.trim().toLowerCase();
-      const categoria = document.getElementById("filtroCategoriaProduto").value;
+      const setorFiltro = document.getElementById("filtroSetorProduto").value;
+      const categoriaFiltro = document.getElementById("filtroCategoriaProduto").value;
 
-      const filtrados = produtosCache.filter((p) => {
+      const filtrados = produtosCache.filter((produto) => {
+        const p = normalizarProduto(produto);
         const atendeBusca =
           !busca ||
           (p.nome || "").toLowerCase().includes(busca) ||
+          (p.setor || "").toLowerCase().includes(busca) ||
           (p.categoria || "").toLowerCase().includes(busca) ||
           String(p.preco || "").includes(busca);
-        const atendeCategoria = !categoria || p.categoria === categoria;
-        return atendeBusca && atendeCategoria;
-      }).sort((a,b) => (a.nome || "").localeCompare(b.nome || "", 'pt-BR'));
+
+        const atendeSetor = !setorFiltro || p.setor === setorFiltro;
+        const atendeCategoria = !categoriaFiltro || p.categoria === categoriaFiltro;
+        return atendeBusca && atendeSetor && atendeCategoria;
+      }).sort((a,b) => (a.nome || "").localeCompare(b.nome || "", "pt-BR"));
 
       lista.innerHTML = "";
       vazio.classList.toggle("hidden", filtrados.length > 0);
 
-      filtrados.forEach((p) => {
+      filtrados.forEach((produto) => {
+        const p = normalizarProduto(produto);
         const item = document.createElement("div");
         item.className = "product-card";
         item.innerHTML = `
           <h4>${p.nome || ""}</h4>
           <div class="meta">
+            <span class="pill sec">${p.setor || "Sem setor"}</span>
             <span class="pill cat">${p.categoria || "Sem categoria"}</span>
-            <span class="pill ${p.ativo === false ? 'off' : 'ok'}">${p.ativo === false ? 'Inativo' : 'Ativo'}</span>
+            <span class="pill ${p.ativo === false ? "off" : "ok"}">${p.ativo === false ? "Inativo" : "Ativo"}</span>
           </div>
           <div><strong>Preço:</strong> ${formatarReais(p.preco || 0)}</div>
           <div class="muted" style="margin-top:8px;">${p.descricao ? p.descricao : "Sem descrição cadastrada."}</div>
           <div class="actions" style="margin-top:14px;">
-            <button class="btn-warning" onclick="editarProduto('${p.id}', ${JSON.stringify(p.nome || "")}, ${JSON.stringify(p.categoria || "")}, '${p.preco || 0}', ${JSON.stringify(p.descricao || "")}, ${p.ativo === false ? 'false' : 'true'})">Editar</button>
+            <button class="btn-warning" onclick="editarProduto('${p.id}')">Editar</button>
             <button class="btn-danger" onclick="excluirProduto('${p.id}')">Excluir</button>
           </div>
         `;
@@ -678,6 +790,57 @@ function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
       });
     }
 
+    function atualizarStatusPedido(id, status){
+      db.collection("pedidos").doc(id).set({ status }, { merge: true })
+        .then(() => toast("Status atualizado com sucesso."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao atualizar status.");
+        });
+    }
+
+    function marcarPedidoEntregue(id){
+      db.collection("pedidos").doc(id).set({
+        statusEntrega: "Entregue",
+        entregue: true,
+        entregueEm: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true })
+      .then(() => toast("Pedido marcado como entregue."))
+      .catch((error) => {
+        console.error(error);
+        toast("Erro ao marcar como entregue.");
+      });
+    }
+
+    function excluirPedido(id){
+      if(!confirm("Deseja excluir este pedido?")) return;
+      db.collection("pedidos").doc(id).delete()
+        .then(() => toast("Pedido excluído com sucesso."))
+        .catch((error) => {
+          console.error(error);
+          toast("Erro ao excluir pedido.");
+        });
+    }
+
+    async function excluirPedidosEntregues(){
+      const entregues = pedidosCache.filter(p => p.entregue === true || (p.statusEntrega || "").toLowerCase().includes("entregue"));
+      if(!entregues.length){
+        toast("Nenhum pedido entregue para excluir.");
+        return;
+      }
+      if(!confirm(`Deseja excluir ${entregues.length} pedido(s) entregue(s)?`)) return;
+
+      try{
+        const batch = db.batch();
+        entregues.forEach(p => batch.delete(db.collection("pedidos").doc(p.id)));
+        await batch.commit();
+        toast("Pedidos entregues excluídos.");
+      }catch(error){
+        console.error(error);
+        toast("Erro ao excluir pedidos entregues.");
+      }
+    }
+
     function renderPedidos(){
       const lista = document.getElementById("listaPedidos");
       const vazio = document.getElementById("emptyPedidos");
@@ -686,10 +849,11 @@ function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
 
       const filtrados = pedidosCache.filter((p) => {
         const nome = (p.nome || "").toLowerCase();
-        const telefone = (p.telefone || "").toLowerCase();
-        const status = (p.status || "");
+        const telefone = String(p.telefone || "").toLowerCase();
+        const statusPagamento = (p.status || "");
+        const statusEntrega = (p.statusEntrega || (p.entregue ? "Entregue" : "Pendente"));
         const atendeBusca = !busca || nome.includes(busca) || telefone.includes(busca);
-        const atendeStatus = !filtroStatus || status.includes(filtroStatus);
+        const atendeStatus = !filtroStatus || statusPagamento.includes(filtroStatus) || statusEntrega.includes(filtroStatus);
         return atendeBusca && atendeStatus;
       });
 
@@ -697,10 +861,12 @@ function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
       vazio.classList.toggle("hidden", filtrados.length > 0);
 
       filtrados.forEach((p) => {
-        const statusPago = (p.status || "").toLowerCase().includes("pago");
+        const pago = (p.status || "").toLowerCase().includes("pago");
+        const entregue = p.entregue === true || (p.statusEntrega || "").toLowerCase().includes("entregue");
         const entregaTexto = p.entrega === "barco"
           ? `Barco: ${p.nomeBarco || ""} | Vila: ${p.nomeVila || ""}`
           : (p.entrega || "Não informado");
+
         const produtosHtml = (p.produtos || []).map(item => {
           const subtotal = Number(item.preco || 0) * Number(item.quantidade || 0);
           return `<li>${item.nome || ""} x ${item.quantidade || 0} - ${formatarReais(subtotal)}</li>`;
@@ -713,7 +879,8 @@ function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
             <div>
               <h4>${p.nome || "Cliente sem nome"}</h4>
               <div class="meta">
-                <span class="pill ${statusPago ? 'ok' : 'warn'}">${p.status || "Sem status"}</span>
+                <span class="pill ${pago ? "ok" : "warn"}">${p.status || "Sem status"}</span>
+                <span class="pill ${entregue ? "info" : "off"}">${entregue ? "Entregue" : "Pendente entrega"}</span>
                 <span class="pill cat">+${p.telefone || ""}</span>
                 <span class="pill cat">${p.entrega || "Entrega não informada"}</span>
               </div>
@@ -727,21 +894,13 @@ function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
             <ul>${produtosHtml || "<li>Nenhum item</li>"}</ul>
           </div>
           <div class="actions" style="margin-top:12px;">
-            <button class="btn-success" onclick="atualizarStatusPedido('${p.id}','Pago')">Marcar como pago</button>
-            <button class="btn-secondary" onclick="atualizarStatusPedido('${p.id}','Aguardando pagamento')">Voltar para aguardando</button>
+            <button class="btn-success" onclick="atualizarStatusPedido('${p.id}','Pago')">Confirmar pago</button>
+            <button class="btn-info" onclick="marcarPedidoEntregue('${p.id}')">Confirmar entregue</button>
+            <button class="btn-danger" onclick="excluirPedido('${p.id}')">Excluir pedido</button>
           </div>
         `;
         lista.appendChild(card);
       });
-    }
-
-    function atualizarStatusPedido(id, status){
-      db.collection("pedidos").doc(id).set({ status }, { merge: true })
-        .then(() => toast("Status atualizado com sucesso."))
-        .catch((error) => {
-          console.error(error);
-          toast("Erro ao atualizar status.");
-        });
     }
 
     function atualizarResumo(){
@@ -754,19 +913,22 @@ function atualizarCategoriasPorSetor(categoriaSelecionada = "") {
     }
 
     function rolarPara(id){
-      document.querySelectorAll('.nav button').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll(".nav button").forEach(btn => btn.classList.remove("active"));
       const sec = document.getElementById(id);
-      if(sec) sec.scrollIntoView({behavior:'smooth', block:'start'});
-      const btn = Array.from(document.querySelectorAll('.nav button')).find(b => {
-        const fn = b.getAttribute('onclick') || '';
+      if(sec) sec.scrollIntoView({behavior:"smooth", block:"start"});
+      const btn = Array.from(document.querySelectorAll(".nav button")).find(b => {
+        const fn = b.getAttribute("onclick") || "";
         return fn.includes(id);
       });
-      if(btn) btn.classList.add('active');
+      if(btn) btn.classList.add("active");
     }
 
-    if('serviceWorker' in navigator){
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').catch(console.error);
+    atualizarCategoriasPorSetor();
+    atualizarFiltroCategoriaProduto();
+
+    if("serviceWorker" in navigator){
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js").catch(console.error);
       });
     }
   </script>
